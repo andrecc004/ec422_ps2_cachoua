@@ -1,0 +1,63 @@
+---
+title: "lecture week 3"
+author: "Andre Cachoua"
+date: "2026-10-12"
+output: html_document
+---
+Monday, October 12
+
+Activity 1: Load NSA non-farm payroll employment and create a “tsibble”
+
+A) Create a new R-script (call it something you will remember and save it somewhere you can find later.)
+
+B) Load the required packages:
+
+library(tidyquant)
+library(tidyverse)
+library(fpp3)
+
+C) Next load U.S. non-farm payroll employment (not seasonally adjusted) from FRED (note - it is a "Q" in tq_get below):
+
+emp_raw <- tq_get(
+c("PAYNSA"),
+get = "economic.data",
+from = "1976-01-01"
+)
+
+D) Now rename the columns:
+
+emp <- emp_raw |>
+mutate(Month = yearmonth(date), employment = price) |>
+select(Month, employment)
+
+E) Turn the data into a “time series tibble” – called a “tsibble”:
+
+emp <- emp |>
+as_tsibble(index = Month)
+
+F) View the first few rows of your tsibble
+
+head(emp)
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+
+install.packages("fpp3")
+```
+
+```{r}
+library(tidyquant)
+library(tidyverse)
+library(fpp3)
+```
+
+```{r}
+
+```
