@@ -1,6 +1,6 @@
 ---
 title: "Problem Set 2"
-author: "Your Name"
+author: "Andre Cachoua"
 date: today
 format:
   html:
@@ -8,23 +8,115 @@ format:
     embed-resources: true
 ---
 
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+**GitHub repo:** <https://github.com/andrecc004/ec422_ps2_cachoua>
 
 ```{r}
-1 + 1
+#| include: false
+library(tidyverse)
+library(tidyquant)
+library(knitr)
+source("ps2_script_cachoua.R")
 ```
 
-You can add options to executable code like this
+## Data
+
+This problem set uses seasonally adjusted monthly unemployment rates (percent) for the United States (UNRATE) and four states: Oregon (ORUR), California (CAUR), Texas (TXUR) and New York (NYUR). The data come from FRED (St. Louis Fed) via `tidyquant::tq_get()` and run from January 1976 to the present. The October 2025 value is missing because of the government shutdown, so I filled it with the September value.
 
 ```{r}
 #| echo: false
-2 * 2
+kable(head(unemp_raw), caption = "First six rows of the raw data (long format)")
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+## Wrangling
+
+```{r}
+#| echo: false
+kable(unemp_summary, digits = 2,
+      caption = "Mean, min and max unemployment rate by region, full sample (1976 to present)")
+```
+
+```{r}
+#| echo: false
+kable(unemp_recent_summary, digits = 2,
+      caption = "Mean, min and max unemployment rate by region, January 2015 onward")
+```
+
+```{r}
+#| echo: false
+kable(unemp_top_increases_no_covid, digits = 2,
+      caption = "Largest month-over-month increases in the unemployment rate (percentage points), excluding 2020")
+```
+
+```{r}
+#| echo: false
+kable(unemp_top_decreases_no_covid, digits = 2,
+      caption = "Largest month-over-month decreases in the unemployment rate (percentage points), excluding 2020")
+```
+
+## Visualization
+
+### Unemployment rates, all regions
+
+```{r}
+#| echo: false
+ggplot(unemp, aes(x = date, y = unemployment_rate, color = region)) +
+  geom_line() +
+  labs(
+    title = "Monthly Unemployment Rate U.S. and States",
+    x = "Date", y = "Unemployment rate (%)", color = "Region"
+  ) +
+  theme_minimal()
+```
+
+### Unemployment rates by region (faceted)
+
+```{r}
+#| echo: false
+ggplot(unemp, aes(x = date, y = unemployment_rate, color = region)) +
+  geom_line() +
+  facet_wrap(~ region) +
+  labs(
+    title = "Monthly Unemployment Rate by Region",
+    x = "Date", y = "Unemployment rate %"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+### Average unemployment rate by region
+
+```{r}
+#| echo: false
+ggplot(unemp_summary, aes(x = fct_reorder(region, mean_rate), y = mean_rate)) +
+  geom_col() +
+  labs(
+    title = "Average Unemployment Rate by Region, 1976 to Present",
+    x = "Region", y = "Mean unemployment rate %"
+  ) +
+  theme_minimal()
+```
+
+### Oregon vs. U.S. gap
+
+```{r}
+#| echo: false
+unemp |>
+  filter(region %in% c("Oregon", "United States")) |>
+  select(date, region, unemployment_rate) |>
+  pivot_wider(names_from = region, values_from = unemployment_rate) |>
+  mutate(gap = Oregon - `United States`) |>
+  ggplot(aes(x = date, y = gap)) +
+  geom_line() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(
+    title = "Oregon Unemployment Rate Minus U.S. Rate",
+    x = "Date", y = "Percentage points"
+  ) +
+  theme_minimal()
+```
+
+This shows when Oregon’s labor market ran worse or better than the nation’s, so above the zero line, Oregon is doing worse than the nation, and below it, Oregon is doing better. We can see the gap tends to widen during and after recessions , for exmaple in the early 1980s, 2001 to 2003 and 2009 which I imagine is suggesting Oregon’s labor market is more sensitive to the business cycle than the national average, generally a rising gap means Oregon is worsening relative to the U.S.
+
+## Reflection
+
+Finally, the code was straightforward for me. I’ve had good experience with R before, so after some time away from it this was a good refresher. I also have a fair amount of experience with Git and GitHub, so that part was straightforward as well. What slightly tripped me up was loading the data, because I didn’t expect to be able to pull directly from FRED using `tidyquant`, though it was fun to see how it works. I’m also still new to Quarto, but it seems similar enough compared to LaTeX or plain Markdown for formatting code and making writeups. After working through this Im definitely more comfortable with Quarto, especially combining code chunks, tables and figures into a single rendered report.
