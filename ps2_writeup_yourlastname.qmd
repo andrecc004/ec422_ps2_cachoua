@@ -24,7 +24,7 @@ This problem set uses seasonally adjusted monthly unemployment rates (percent) f
 
 ```{r}
 #| echo: false
-kable(head(unemp_raw), caption = "First six rows of the raw data (long format)")
+kable(head(unemp_raw), caption = "First six rows of the raw data")
 ```
 
 ## Wrangling
@@ -38,19 +38,19 @@ kable(unemp_summary, digits = 2,
 ```{r}
 #| echo: false
 kable(unemp_recent_summary, digits = 2,
-      caption = "Mean, min and max unemployment rate by region, January 2015 onward")
+      caption = "Mean, min and max unemployment rate by region 2015+")
 ```
 
 ```{r}
 #| echo: false
 kable(unemp_top_increases_no_covid, digits = 2,
-      caption = "Largest month-over-month increases in the unemployment rate (percentage points), excluding 2020")
+      caption = "Largest month-over-month increases in the unemployment rate %")
 ```
 
 ```{r}
 #| echo: false
 kable(unemp_top_decreases_no_covid, digits = 2,
-      caption = "Largest month-over-month decreases in the unemployment rate (percentage points), excluding 2020")
+      caption = "Largest month overmonth decreases in the unemployment rate %")
 ```
 
 ## Visualization
@@ -63,7 +63,7 @@ ggplot(unemp, aes(x = date, y = unemployment_rate, color = region)) +
   geom_line() +
   labs(
     title = "Monthly Unemployment Rate U.S. and States",
-    x = "Date", y = "Unemployment rate (%)", color = "Region"
+    x = "Date", y = "Unemployment rate %", color = "Region"
   ) +
   theme_minimal()
 ```
@@ -87,13 +87,15 @@ ggplot(unemp, aes(x = date, y = unemployment_rate, color = region)) +
 
 ```{r}
 #| echo: false
-ggplot(unemp_summary, aes(x = fct_reorder(region, mean_rate), y = mean_rate)) +
+ggplot(unemp_summary, aes(x = fct_reorder(region, mean_rate), y = mean_rate, fill = region)) +
   geom_col() +
+  scale_fill_brewer(palette = "Set2") +
   labs(
     title = "Average Unemployment Rate by Region, 1976 to Present",
-    x = "Region", y = "Mean unemployment rate %"
+    x = "Region", y = "Mean unemployment rate (%)"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(legend.position = "none")
 ```
 
 ### Oregon vs. U.S. gap

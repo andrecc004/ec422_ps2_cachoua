@@ -10,7 +10,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-
 ```{r}
 unemp <- unemp_raw |>
   rename(unemployment_rate = price) |>
@@ -51,10 +50,8 @@ unemp_summary <- unemp |>
   summarize(
     mean_rate = mean(unemployment_rate, na.rm = TRUE),
     min_rate  = min(unemployment_rate, na.rm = TRUE),
-    max_rate  = max(unemployment_rate, na.rm = TRUE)
-  )
+    max_rate  = max(unemployment_rate, na.rm = TRUE))
 
-# Same summary, 2015 onward
 unemp_recent_summary <- unemp_recent |>
   group_by(region) |>
   summarize(
@@ -114,13 +111,15 @@ ggplot(unemp, aes(x = date, y = unemployment_rate, color = region)) +
 ```
 
 ```{r}
-ggplot(unemp_summary, aes(x = fct_reorder(region, mean_rate), y = mean_rate)) +
+ggplot(unemp_summary, aes(x = fct_reorder(region, mean_rate), y = mean_rate, fill = region)) +
   geom_col() +
+  scale_fill_brewer(palette = "Set2") +
   labs(
     title = "Average Unemployment Rate by Region, 1976 to Present",
-    x = "Region", y = "Mean unemployment rate %"
+    x = "Region", y = "Mean unemployment rate (%)"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(legend.position = "none")
 ```
 
 ```{r}
