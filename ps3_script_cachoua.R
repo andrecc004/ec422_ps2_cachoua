@@ -1,6 +1,6 @@
-# EC 422 – Problem Set 3
+# EC 422 - Problem Set 3
 # Andre Cachoua
-# All code for Parts 2–5, in the order it was run.
+# All code for Parts 2-5, in the order it was run.
 # Data: data/retail_sales_raw.csv (FRED RSAFS + RSAFSNA, downloaded manually)
 
 # ===================== Part 2: Time-Series Data in R =====================
@@ -113,19 +113,18 @@ can_gas |>
   autoplot(Volume) +
   labs(
     title = "Canadian Natural Gas Production",
-    subtitle = "Monthly, January 1960 – February 2005",
+    subtitle = "Monthly, January 1960 to February 2005",
     x = NULL, y = "Billions of cubic meters"
   ) +
   theme_minimal()
 
-# 2.7d: add a LOESS smoother and comma-formatted y-axis to the retail plot
+# 2.7d: add a smoothed trend line to the retail plot
 retail_ts |>
   autoplot(sales) +
   geom_smooth(method = "loess", se = FALSE, linewidth = 0.8, linetype = "dashed") +
-  scale_y_continuous(labels = scales::label_dollar(scale = 1e-3, suffix = "B")) +
   labs(
-    title = "U.S. Retail and Food Services Sales with LOESS Trend",
-    x = NULL, y = "Sales (billions of dollars)", color = NULL
+    title = "U.S. Retail and Food Services Sales with Smoothed Trend",
+    x = NULL, y = "Millions of dollars", color = NULL
   ) +
   theme_minimal()
 
@@ -174,7 +173,7 @@ can_gas <- can_gas |>
 
 can_gas |>
   autoplot(growth_gap) +
-  labs(title = "Gap Between Exact and Log-Difference Growth Rates",
+  labs(title = "Gap Between Direct and Log-Difference Growth Rates",
        x = NULL, y = "Absolute difference (percentage points)") +
   theme_minimal()
 
@@ -331,7 +330,7 @@ gas_cv_fc |>
   semi_join(as_tibble(can_gas), by = "Month") |>
   summarize(first = min(Month), last = max(Month), n = n_distinct(Month))
 
-# ---- 5.2 Diebold–Mariano test ----
+# ---- 5.2 Diebold-Mariano test ----
 errs <- gas_cv_fc |>
   as_tibble() |>
   left_join(as_tibble(can_gas) |> select(Month, actual = Volume),
